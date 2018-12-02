@@ -1,0 +1,36 @@
+
+h1 {
+  font-family: impact;
+  font-size: 64px;
+  padding: .5em 0;
+}
+
+body {
+  text-align: center;
+}
+
+input {
+  border-radius: 50%;
+  margin: 1em;
+  padding: .5em 1em;
+}
+
+li {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.comic {
+  font-family: 'Comic Sans';
+  font-size: 25px;
+}
+
+.header {
+  background-color: #add8e6;
+  padding: 1em;
+}
+
+.body {
+  background-color: #fff;
+  padding: 2em;
+}
