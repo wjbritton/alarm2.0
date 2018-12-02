@@ -17,6 +17,7 @@ let hours, minutes, year, day, month
 let currentTime = hours + ':' + minutes + ' ' + year + '-' + month + '-' + day
 
 // Weather API
+let api 
 let count = 0
 let C, F, CF
 let temp
@@ -37,13 +38,17 @@ let alarmArrDate
 // C / F Toggle
 function toggleTF(){
     count++
+    console.log(count);
     tempCheck();
+    if(count === 2){
+        count = 0;
+        APIWeatherCall(api)
+    }
 }
 
 function tempCheck(){
-    console.log("Temp Change F C")
+console.log("Temp Change F C")
   const temp = ['F', 'C']
-  
   odd = count % 2
   $('#FC').html(temp[odd])
   console.log("FC Switch")
@@ -88,15 +93,11 @@ function weatherDisplay(x) {
     tempature(temp)
 }
 
-// Get Long Lat and send AJAX get to weather API
-function showPosition (position) {
-    lat = position.coords.latitude
-    long = position.coords.longitude
-    lat = lat.toFixed(2)
-    long = long.toFixed(2)
-    const api = 'https://fcc-weather-api.glitch.me/api/current?lat=' + lat + '&lon=' + long
+//API Call
+
+function APIWeatherCall(x){
     $.ajax({
-        url: api,
+        url: x,
         type: 'GET',
         success: function(response){
             weatherDisplay(response);
@@ -105,65 +106,74 @@ function showPosition (position) {
     })
 }
 
-
-
-// F to C Switch Handler
-$("#tempType").on("click", toggleTF);
-
+// Get Long Lat and send AJAX get to weather API
+function showPosition (position) {
+    lat = position.coords.latitude
+    long = position.coords.longitude
+    lat = lat.toFixed(2)
+    long = long.toFixed(2)
+    api = 'https://fcc-weather-api.glitch.me/api/current?lat=' + lat + '&lon=' + long
+    APIWeatherCall(api); 
+}
 
 //On Start get Location
 getLocation()
 
 $(() => {
   $('#submitInput').on('click', function () {
-    countAlarms++
+    
     console.log(countAlarms)
     let time = document.getElementById('timeInput').value
     let date = document.getElementById('dateInput').value
-    $('#timeInput').val('')
-    $('#dateInput').val('')
-    timeForm = time
-    timeForm = timeForm.split(':')
-    // console.log('SPLIT ' + timeForm[0] + ' ' + timeForm)
-    let timeForm1 = parseInt(timeForm[0])
-    // console.log(timeForm1 + ' | ' + typeof timeForm1)
-    if (timeForm1 > 12) {
-      amPm = 'PM'
-      timeForm1 = timeForm1 - 12
-      // console.log('successful convertion ' + timeForm1)
-    } else {
-      amPm = 'AM'
-    }
-    timeForm = timeForm.join(':')
-    alarmTime = time + ' ' + date
-    alarmArr.push(
-      {
-        alarmTime: time,
-        alarmDate: date,
-        alarmNumber: countAlarms
-      }
-    )
-     console.log(alarmArr)
-    let arrTime = hours + ':' + minutes
-    let arrDate = year + '-' + month + '-' + day
-    // for (let i = 0; i < alarmArr.length; i++) {
-    //   alarmArrTime = alarmArr[i].alarmTime
-    //   alarmArrDate = alarmArr[i].alarmDate
-    // }
 
-    $('#alarm').append('<li id="' + countAlarms + '">' + date + ' ' + timeForm + '  ' + amPm + '&nbsp;&nbsp;<button id="deleteAlarm' + countAlarms + '">Delete</button>&nbsp;&nbsp;<button id="editAlarm' + countAlarms + '">Edit</button></li>')
-    $('#deleteAlarm' + countAlarms).bind('click', function () {
-      let li = $(this).parent()
-      li.remove()
-      for (let i = 0; i < alarmArr.length; i++) {
-        let index = alarmArr[i].alarmNumber.toString()
-        let target = li[0].id
-        if (index === target) {
-          alarmArr.splice(i, 1)
-          console.log('sliced ' + alarmArr)
+    // Check for empty entry 
+    if(time && date !== ''){
+        countAlarms++
+        $('#timeInput').val('')
+        $('#dateInput').val('')
+        timeForm = time
+        timeForm = timeForm.split(':')
+        // console.log('SPLIT ' + timeForm[0] + ' ' + timeForm)
+        let timeForm1 = parseInt(timeForm[0])
+        // console.log(timeForm1 + ' | ' + typeof timeForm1)
+        if (timeForm1 > 12) {
+        amPm = 'PM'
+        timeForm1 = timeForm1 - 12
+        // console.log('successful convertion ' + timeForm1)
+        } else {
+        amPm = 'AM'
         }
-      }
-    })
+        timeForm = timeForm.join(':')
+        alarmTime = time + ' ' + date
+        alarmArr.push(
+        {
+            alarmTime: time,
+            alarmDate: date,
+            alarmNumber: countAlarms
+        }
+        )
+        console.log(alarmArr)
+        let arrTime = hours + ':' + minutes
+        let arrDate = year + '-' + month + '-' + day
+        // for (let i = 0; i < alarmArr.length; i++) {
+        //   alarmArrTime = alarmArr[i].alarmTime
+        //   alarmArrDate = alarmArr[i].alarmDate
+        // }
+
+        $('#alarm').append('<li id="' + countAlarms + '">' + date + ' ' + timeForm + '  ' + amPm + '&nbsp;&nbsp;<button id="deleteAlarm' + countAlarms + '">Delete</button>&nbsp;&nbsp;<button id="editAlarm' + countAlarms + '">Edit</button></li>')
+        $('#deleteAlarm' + countAlarms).bind('click', function () {
+        let li = $(this).parent()
+        li.remove()
+        for (let i = 0; i < alarmArr.length; i++) {
+            let index = alarmArr[i].alarmNumber.toString()
+            let target = li[0].id
+            if (index === target) {
+            alarmArr.splice(i, 1)
+            console.log('sliced ' + alarmArr)
+            }
+        }
+        })
+    }
   })
 
   // End Click
@@ -240,7 +250,6 @@ setInterval(function checkForAlarm () {
   //   }
   // }
 
-  console.log()
   // show lat long
   $('#LogLat').html('Latitude ' + lat + ' ' + 'Longitude ' + long)
 }, 1000)
